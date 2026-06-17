@@ -28,92 +28,34 @@
 
 ## 🚀 설치 및 실행 방법 (How to Run)
 
-### 1. MySQL 데이터베이스 및 테이블 구축
+이 프로젝트는 별도의 수동 데이터베이스 설정 단계 없이, 웹 서버 실행 시 **데이터베이스와 테이블이 자동으로 구축**되도록 설계되어 있습니다.
 
-로컬 MySQL 서버를 실행한 뒤, 동봉된 `schema.sql` 스크립트를 실행하여 데이터베이스와 테이블을 생성합니다.
-
-```bash
-# MySQL 접속 후 스크립트 실행 또는 GUI 툴(HeidiSQL, Workbench 등)에서 실행
-mysql -u root -p < schema.sql
-```
-
-*기본 설정: 호스트 `localhost`, 계정 `root`, 비밀번호 `1234`, 데이터베이스 `myboard`, 테이블 `post`*
-*만약 MySQL 비밀번호가 다를 경우 `Server.js` 상단의 데이터베이스 커넥션 설정 코드에서 비밀번호를 수정해 주세요.*
-
-### 2. 의존성 패키지 설치
-
+### 1. 의존성 패키지 설치
 프로젝트 루트 디렉토리(`timetable`)에서 아래 명령어를 실행하여 의존 라이브러리를 설치합니다.
-
 ```bash
 npm install
 ```
 
-### 3. 서버 실행
+### 2. MySQL 접속 정보 확인 (필수)
+이 프로젝트의 기본 데이터베이스 연결 비밀번호는 **`1234`**로 하드코딩 되어 있습니다.
+* 만약 테스트 환경 PC의 MySQL root 비밀번호가 `1234`가 아니라면, [Server.js](file:///d:/coding/backend_assgiment/timetable/Server.js) 5행의 `password: "1234"` 부분을 실제 root 비밀번호로 반드시 변경해 주셔야 정상 구동됩니다.
+* 해당 PC에서 MySQL 서버가 켜져(Running) 있는 상태여야 합니다.
 
-서버를 기동합니다.
-
+### 3. 서버 실행 (자동 DB 구축)
+아래 명령을 통해 서버를 실행합니다.
 ```bash
 node Server.js
 ```
-
-서버가 정상 구동되면 터미널에 `포트 8080으로 서버 대기중 ...` 메시지가 출력됩니다.
+* 서버가 실행되면 콘솔 창에 `데이터베이스 및 테이블 초기화 완료!` 로그가 뜨며, `myboard` 데이터베이스와 `post` 테이블이 존재하지 않는 경우 자동으로 안전하게 생성합니다. (이미 존재한다면 기존 데이터가 유실되지 않고 안전하게 유지됩니다.)
 
 ### 4. 웹 브라우저 접속
-
 크롬(Chrome) 등의 브라우저를 열고 아래 주소로 접속합니다.
-
 - **메인 홈**: [http://localhost:8080/](http://localhost:8080/)
 - **과목 등록**: [http://localhost:8080/enter](http://localhost:8080/enter)
 - **시간표 조합 확인**: [http://localhost:8080/list](http://localhost:8080/list)
 
-## 다른 환경(압축 해제 후)에서 실행 방법
+---
 
-전달받은 압축 파일(`timetable_project.zip`)을 다른 PC나 새로운 개발 환경에서 해제하고 테스트할 때는 아래 순서대로 진행합니다.
-
-### 1. 압축 해제 및 경로 이동
-
-압축 파일의 압축을 푼 뒤, 터미널을 열고 해당 프로젝트 폴더로 이동합니다.
-
-```bash
-cd timetable
-```
-
-### 2. 의존성 패키지 재설치
-
-압축 파일에는 대용량의 `node_modules` 폴더가 들어있지 않으므로, 아래 명령어를 실행하여 필요한 패키지를 새로 설치해 주어야 합니다.
-
-```bash
-npm install
-```
-
-### 3. MySQL 데이터베이스 및 테이블 구축
-
-테스트 대상 PC에 MySQL Server가 켜져 있는지 확인한 후, 아래 명령어를 통해 데이터베이스 스키마를 적용합니다.
-
-* **Windows PowerShell 환경인 경우 (추천)**:
-
-  ```powershell
-  Get-Content schema.sql | & "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" -u root -p
-  ```
-* **일반 CMD 환경인 경우**:
-
-  ```bash
-  mysql -u root -p < schema.sql
-  ```
-
-  *(비밀번호를 입력하라는 메시지가 뜨면 해당 PC의 MySQL root 비밀번호를 입력합니다.)*
-
-> **[IMPORTANT] MySQL 비밀번호 관련 필수 확인사항**
->
-> * 이 프로젝트의 기본 데이터베이스 연결 비밀번호는 **`1234`**로 하드코딩 되어 있습니다.
-> * 만약 테스트 환경 PC의 MySQL root 비밀번호가 `1234`가 아니라면, [Server.js](file:///d:/coding/backend_assgiment/timetable/Server.js)의 5번 줄 `password: "1234"` 부분을 해당 PC의 실제 root 비밀번호로 반드시 수정해 주어야 웹 서버와 DB가 정상 연동됩니다.
-
-### 4. 서버 실행 및 결과 확인
-
-서버 구동 명령을 내립니다.
-
-```bash
-node Server.js
-```
-
-서버가 켜지면 웹 브라우저를 열고 **[http://localhost:8080/](http://localhost:8080/)**로 접속하여 기능을 테스트합니다.
+## ⚠️ 제출 시 주의사항 (과제 제출용)
+- 과제 제출을 위해 폴더를 ZIP 등으로 압축할 때, **용량이 큰 `node_modules` 폴더는 반드시 제외하고 압축**하여 제출해 주세요. (제공된 `timetable_project.zip` 파일은 이미 `node_modules`가 제외된 상태입니다.)
+- 다른 단말이나 채점 기기에서 복사본을 실행할 때도, 압축을 해제하고 위 **[설치 및 실행 방법]**의 3단계를 동일하게 진행하면 DB 수동 셋업 없이 즉시 작동합니다.

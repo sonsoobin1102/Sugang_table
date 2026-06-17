@@ -3,9 +3,6 @@ CREATE DATABASE IF NOT EXISTS myboard DEFAULT CHARACTER SET utf8mb4 COLLATE utf8
 
 USE myboard;
 
--- 기존 테이블이 존재하면 삭제 (스키마 갱신용)
-DROP TABLE IF EXISTS post;
-
 -- 과목 데이터를 저장할 post 테이블 생성
 CREATE TABLE IF NOT EXISTS post (
     id INT AUTO_INCREMENT PRIMARY KEY,

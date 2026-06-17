@@ -3,16 +3,47 @@ var conn = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "1234",
-    database: "myboard",
 });
 
 conn.connect(function (err) {
     if (err) {
         console.error("MySQL 연결 실패:", err);
+        process.exit(1);
     } else {
         console.log("MySQL 연결 성공!");
+        initializeDatabase();
     }
 });
+
+function initializeDatabase() {
+    conn.query("CREATE DATABASE IF NOT EXISTS myboard DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci", function (err) {
+        if (err) {
+            console.error("데이터베이스 생성 실패:", err);
+            process.exit(1);
+        }
+        conn.changeUser({ database: "myboard" }, function (err) {
+            if (err) {
+                console.error("데이터베이스 전환 실패:", err);
+                process.exit(1);
+            }
+            const createTableSql = `
+                CREATE TABLE IF NOT EXISTS post (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    title VARCHAR(255) NOT NULL,
+                    content TEXT NOT NULL
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            `;
+            conn.query(createTableSql, function (err) {
+                if (err) {
+                    console.error("테이블 생성 실패:", err);
+                    process.exit(1);
+                }
+                console.log("데이터베이스 및 테이블 초기화 완료!");
+                startServer();
+            });
+        });
+    });
+}
 
 const express = require('express');
 const app = express();
@@ -23,9 +54,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set('views', __dirname + '/view');
 app.set('view engine', 'ejs');
 
-app.listen(8080, function () {
-    console.log("포트 8080으로 서버 대기중 ...")
-});
+function startServer() {
+    app.listen(8080, function () {
+        console.log("포트 8080으로 서버 대기중 ...");
+    });
+}
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
