@@ -82,3 +82,18 @@ MySQL 연결 성공!
 * **메인 홈 (조합 생성기)**: [http://localhost:8080/](http://localhost:8080/)
 * **과목 정보 등록**: [http://localhost:8080/enter](http://localhost:8080/enter)
 * **등록 과목 목록 및 저장된 시간표**: [http://localhost:8080/list](http://localhost:8080/list)
+
+---
+
+## 💡 부가 설명: MySQL 설치 가이드
+
+이 프로젝트를 구동하기 위해서는 로컬 환경에 **MySQL 커뮤니티 서버 다운로드 및 설치**가 선행되어야 합니다.
+
+### 1. MySQL 다운로드 및 설치 방법
+1. **다운로드 페이지 접속**: [MySQL Community Downloads](https://dev.mysql.com/downloads/installer/)로 이동합니다.
+2. **Installer 다운로드**: `Windows (x86, 32-bit), MSI Installer` 중 용량이 큰 버전(예: `mysql-installer-community-...`)을 다운로드합니다.
+3. **설치 프로그램 실행**: 다운로드한 인스톨러를 실행하고, 설치 유형(Setup Type)은 **'Developer Default'** 혹은 **'Server only'**를 선택합니다.
+4. **[중요] root 비밀번호 설정**:
+   - 설치 진행 중 `Accounts and Roles` 단계에서 MySQL **root 계정의 비밀번호를 `1234`로 설정**해 주세요.
+   - 비밀번호를 `1234`로 설정하시면 프로젝트 내부의 연동 코드와 즉시 부합하여, 별도의 소스 코드 수정 없이 `node Server.js` 명령만으로 바로 연동됩니다.
+5. **설치 완료**: 나머지 설정은 기본값을 유지한 채 설치를 마무리합니다. (설치 완료 후 MySQL 서비스가 자동으로 백그라운드에서 구동됩니다.)
