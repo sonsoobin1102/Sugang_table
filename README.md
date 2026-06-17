@@ -54,8 +54,4 @@ node Server.js
 - **과목 등록**: [http://localhost:8080/enter](http://localhost:8080/enter)
 - **시간표 조합 확인**: [http://localhost:8080/list](http://localhost:8080/list)
 
----
 
-## ⚠️ 제출 시 주의사항 (과제 제출용)
-- 과제 제출을 위해 폴더를 ZIP 등으로 압축할 때, **용량이 큰 `node_modules` 폴더는 반드시 제외하고 압축**하여 제출해 주세요. (제공된 `timetable_project.zip` 파일은 이미 `node_modules`가 제외된 상태입니다.)
-- 다른 단말이나 채점 기기에서 복사본을 실행할 때도, 압축을 해제하고 위 **[설치 및 실행 방법]**의 3단계를 동일하게 진행하면 DB 수동 셋업 없이 즉시 작동합니다.
