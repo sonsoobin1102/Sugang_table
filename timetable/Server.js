@@ -1,14 +1,22 @@
-var mysql = require("mysql2");
-var conn = mysql.createConnection({
+const mysql = require("mysql2");
+const fs = require("fs");
+const path = require("path");
+
+// 초기 DB 세팅을 위해 database 옵션을 제외하고 connection을 생성합니다.
+// 다중 쿼리 실행을 위해 multipleStatements 옵션을 활성화합니다.
+const conn = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "1234",
+    multipleStatements: true
 });
 
 conn.connect(function (err) {
     if (err) {
         console.error("MySQL 연결 실패:", err);
-        process.exit(1);
+        console.error("주의: MySQL root 패스워드가 '1234'가 아니거나 MySQL 서버가 꺼져 있을 수 있습니다. 패스워드를 확인하고 수정해 주세요.");
+        // DB 연결에 실패해도 웹 서버는 일단 기동되도록 처리합니다.
+        startServer();
     } else {
         console.log("MySQL 연결 성공!");
         initializeDatabase();
@@ -16,33 +24,30 @@ conn.connect(function (err) {
 });
 
 function initializeDatabase() {
-    conn.query("CREATE DATABASE IF NOT EXISTS myboard DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci", function (err) {
-        if (err) {
-            console.error("데이터베이스 생성 실패:", err);
-            process.exit(1);
-        }
-        conn.changeUser({ database: "myboard" }, function (err) {
+    try {
+        const schemaPath = path.join(__dirname, "schema.sql");
+        const sql = fs.readFileSync(schemaPath, "utf8");
+        
+        conn.query(sql, function (err, results) {
             if (err) {
-                console.error("데이터베이스 전환 실패:", err);
-                process.exit(1);
+                console.error("데이터베이스 초기화 쿼리 실행 실패:", err);
+            } else {
+                console.log("데이터베이스 & 테이블 초기화 성공!");
+                // 커넥션을 완전히 myboard 데이터베이스로 고정합니다.
+                conn.changeUser({ database: "myboard" }, function (err) {
+                    if (err) {
+                        console.error("데이터베이스 전환 실패 (myboard):", err);
+                    } else {
+                        console.log("데이터베이스 전환 완료 (myboard)");
+                    }
+                    startServer();
+                });
             }
-            const createTableSql = `
-                CREATE TABLE IF NOT EXISTS post (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    title VARCHAR(255) NOT NULL,
-                    content TEXT NOT NULL
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-            `;
-            conn.query(createTableSql, function (err) {
-                if (err) {
-                    console.error("테이블 생성 실패:", err);
-                    process.exit(1);
-                }
-                console.log("데이터베이스 및 테이블 초기화 완료!");
-                startServer();
-            });
         });
-    });
+    } catch (err) {
+        console.error("schema.sql 로딩 실패:", err);
+        startServer(); // 파일 로딩 실패 시에도 서버 실행 시도
+    }
 }
 
 const express = require('express');
@@ -56,7 +61,7 @@ app.set('view engine', 'ejs');
 
 function startServer() {
     app.listen(8080, function () {
-        console.log("포트 8080으로 서버 대기중 ...");
+        console.log("포트 8080으로 서버 대기중 ...")
     });
 }
 
