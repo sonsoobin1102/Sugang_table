@@ -2,6 +2,8 @@
 
 원하는 과목과 분반을 데이터베이스에 등록하면, 백트래킹(Backtracking) 알고리즘을 활용하여 시간 충돌이 없는 가능한 모든 시간표 조합을 자동으로 생성하고 시각화해주는 Express + MySQL + EJS 웹 애플리케이션입니다.
 
+* **GitHub Repository**: [sonsoobin1102/Sugang_table](https://github.com/sonsoobin1102/Sugang_table)
+
 ---
 
 ## ✨ 주요 기능
