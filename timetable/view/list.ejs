@@ -29,65 +29,7 @@
             --subj-6: #a5f3fc; --subj-7: #99f6e4; --subj-8: #a7f3d0; --subj-9: #bef264;
         }
 
-        /* Modern Theme (Dark/Teal) */
-        [data-theme="modern"] {
-            --primary-color: #06b6d4;
-            --primary-dark: #0891b2;
-            --secondary-color: #1e293b;
-            --text-color: #f8fafc;
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --border-color: #334155;
-            --success-color: #10b981;
-            --danger-color: #ef4444;
-            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-            --grid-line: #334155;
 
-            /* Subject Colors (Deep/Rich) */
-            --subj-0: #f43f5e; --subj-1: #ec4899; --subj-2: #d946ef; 
-            --subj-3: #8b5cf6; --subj-4: #6366f1; --subj-5: #3b82f6; 
-            --subj-6: #0ea5e9; --subj-7: #06b6d4; --subj-8: #14b8a6; --subj-9: #10b981;
-        }
-
-        /* Beige Theme (Warm - Earthy) */
-        [data-theme="beige"] {
-            --primary-color: #a1887f;
-            --primary-dark: #8d6e63;
-            --secondary-color: #efebe9;
-            --text-color: #4e342e;
-            --bg-color: #faf8f5;
-            --card-bg: #fffbf7;
-            --border-color: #d7ccc8;
-            --success-color: #81c784;
-            --danger-color: #e57373;
-            --card-shadow: 0 10px 15px -3px rgba(141, 110, 99, 0.1);
-            --grid-line: #e8e0d8;
-
-            /* Subject Colors (Warm Earthy) */
-            --subj-0: #bcaaa4; --subj-1: #d7ccc8; --subj-2: #ffccbc; 
-            --subj-3: #ffe0b2; --subj-4: #ffecb3; --subj-5: #dce775; 
-            --subj-6: #a5d6a7; --subj-7: #80cbc4; --subj-8: #bcaaa4; --subj-9: #e6ee9c;
-        }
-
-        /* Cyberpunk Theme (Neon) */
-        [data-theme="cyberpunk"] {
-            --primary-color: #ff00ff;
-            --primary-dark: #d600d6;
-            --secondary-color: #0a0033;
-            --text-color: #00fff9;
-            --bg-color: #000000;
-            --card-bg: #05001a;
-            --border-color: #ff00ff;
-            --success-color: #00ff00;
-            --danger-color: #ff3131;
-            --card-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
-            --grid-line: #220066;
-
-            /* Subject Colors (Neon glow) */
-            --subj-0: #ff0055; --subj-1: #ff00ff; --subj-2: #9d00ff; 
-            --subj-3: #0011ff; --subj-4: #00eaff; --subj-5: #00ff9d; 
-            --subj-6: #aaff00; --subj-7: #ffff00; --subj-8: #ffaa00; --subj-9: #ff0055;
-        }
 
         * {
             box-sizing: border-box;
@@ -365,18 +307,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2 class="m-0 border-0 pb-0">📅 시간표 조합 시각화</h2>
                         
-                        <div class="d-flex align-items-center gap-3">
-                            <!-- 테마 셀렉터 -->
-                            <div class="d-flex align-items-center gap-2">
-                                <label for="themeSelect" class="form-label m-0 fw-bold" style="white-space: nowrap;">🎨 테마:</label>
-                                <select id="themeSelect" class="form-select form-select-sm" style="width: 130px; background-color: var(--secondary-color); color: var(--text-color); border-color: var(--border-color);">
-                                    <option value="default">기본 (Blue)</option>
-                                    <option value="modern">모던 (Dark)</option>
-                                    <option value="beige">베이지 (Warm)</option>
-                                    <option value="cyberpunk">사이버펑크 (Neon)</option>
-                                </select>
-                            </div>
-                        </div>
+
                     </div>
 
                     <!-- 설정 컨트롤 -->
@@ -457,15 +388,7 @@
             // 그리드 그리기
             renderTimetableGrid();
 
-            // 테마 변경 이벤트
-            $('#themeSelect').change(function() {
-                const theme = $(this).val();
-                if (theme === 'default') {
-                    $('body').removeAttr('data-theme');
-                } else {
-                    $('body').attr('data-theme', theme);
-                }
-            });
+
 
             // AJAX 삭제 바인딩
             $('.delete').click(function (e) {
