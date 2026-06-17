@@ -37,10 +37,26 @@ function initializeDatabase() {
                 conn.changeUser({ database: "myboard" }, function (err) {
                     if (err) {
                         console.error("데이터베이스 전환 실패 (myboard):", err);
+                        startServer();
                     } else {
                         console.log("데이터베이스 전환 완료 (myboard)");
+                        // 구버전 마이그레이션 검사: 'created' 컬럼이 감지되면 데이터 유실 없이 자동 제거합니다.
+                        conn.query("SHOW COLUMNS FROM post LIKE 'created'", function (err, rows) {
+                            if (!err && rows && rows.length > 0) {
+                                console.log("구버전 'created' 컬럼이 감지되어 자동 제거 작업을 진행합니다.");
+                                conn.query("ALTER TABLE post DROP COLUMN created", function (err) {
+                                    if (err) {
+                                        console.error("구버전 'created' 컬럼 자동 제거 실패:", err);
+                                    } else {
+                                        console.log("구버전 'created' 컬럼 자동 제거 완료!");
+                                    }
+                                    startServer();
+                                });
+                            } else {
+                                startServer();
+                            }
+                        });
                     }
-                    startServer();
                 });
             }
         });
