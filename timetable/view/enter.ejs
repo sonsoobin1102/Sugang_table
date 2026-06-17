@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>과목 등록 - 시간표 조합생성기</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+        }
+
+        body {
+            font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background-color: var(--card-bg) !important;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .navbar-brand, .nav-link {
+            color: var(--text-color) !important;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            color: var(--text-color);
+        }
+
+        .form-control, .form-select {
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: #0f172a;
+            border-color: var(--primary-color);
+            color: var(--text-color);
+            box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: #334155;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
+
+        .section-input-item {
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .time-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1055;
+        }
+
+        .toast-msg {
+            background-color: #1e293b;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin-top: 10px;
+            color: #fff;
+            min-width: 250px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">📅 시간표 생성기</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/enter">과목 등록</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/list">시간표 & 목록</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5" style="max-width: 650px;">
+        <div class="card p-4">
+            <h2 class="mb-4 text-center fw-bold">✨ 과목 등록하기</h2>
+            
+            <form id="subjectForm" action="/save" method="post">
+                <!-- 과목명 -->
+                <div class="form-group mb-3">
+                    <label class="form-label fw-bold">과목명</label>
+                    <input type="text" id="subjectName" name="title" class="form-control" placeholder="예: 자료구조" required>
+                </div>
+                
+                <!-- 분반 컨테이너 -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                        <span>분반 정보 (최대 3개)</span>
+                        <button type="button" id="addSectionBtn" class="btn btn-sm btn-secondary">+ 분반 추가</button>
+                    </label>
+                    <div id="sectionsContainer">
+                        <!-- 분반 입력 폼이 동적으로 렌더링됨 -->
+                    </div>
+                </div>
+
+
+
+                <!-- 직렬화된 데이터를 담아 보낼 hidden 인풋 -->
+                <input type="hidden" name="content" id="serializedContent">
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg fw-bold">저장하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 토스트 컨테이너 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- 템플릿: 분반 입력 아이템 -->
+    <template id="sectionTemplate">
+        <div class="section-input-item">
+            <div class="section-header">
+                <span class="fw-bold">분반 #<span class="section-index">1</span></span>
+                <button type="button" class="btn-close btn-close-white remove-section" aria-label="Close"></button>
+            </div>
+            <div class="section-times">
+                <!-- 시간대 입력 로우들이 들어감 -->
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-light mt-2 add-time-btn">+ 시간대 추가</button>
+        </div>
+    </template>
+
+    <!-- 템플릿: 시간대 행 -->
+    <template id="timeRowTemplate">
+        <div class="time-row mt-2">
+            <select class="form-select form-select-sm day-select" style="width: 80px;">
+                <option value="월">월</option>
+                <option value="화">화</option>
+                <option value="수">수</option>
+                <option value="목">목</option>
+                <option value="금">금</option>
+            </select>
+            <select class="form-select form-select-sm start-period" style="width: 100px;">
+                <!-- 교시 옵션 -->
+            </select>
+            <span>~</span>
+            <select class="form-select form-select-sm end-period" style="width: 100px;">
+                <!-- 교시 옵션 -->
+            </select>
+            <button type="button" class="btn btn-sm btn-outline-danger remove-time-btn">&times;</button>
+        </div>
+    </template>
+
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        const MAX_PERIOD = 12;
+        const START_HOUR_OFFSET = 8; 
+
+        $(document).ready(function() {
+
+
+            // 초기 분반 추가
+            addSection();
+
+            // 이벤트 바인딩
+            $('#addSectionBtn').click(addSection);
+
+            // 이벤트 위임
+            $('#sectionsContainer').on('click', '.remove-section', function() {
+                $(this).closest('.section-input-item').remove();
+                updateSectionIndices();
+            });
+
+            $('#sectionsContainer').on('click', '.add-time-btn', function() {
+                const timesContainer = $(this).closest('.section-input-item').find('.section-times');
+                addTimeRow(timesContainer);
+            });
+
+            $('#sectionsContainer').on('click', '.remove-time-btn', function() {
+                const sectionItem = $(this).closest('.section-input-item');
+                // 시간대가 최소 1개는 있어야 하므로 삭제 검사
+                if (sectionItem.find('.time-row').length <= 1) {
+                    showToast('분반별 최소 하나의 시간대는 등록해야 합니다.', 'danger');
+                    return;
+                }
+                $(this).closest('.time-row').remove();
+            });
+
+            // 폼 서브밋 시 직렬화
+            $('#subjectForm').submit(function(e) {
+                e.preventDefault();
+
+                const name = $('#subjectName').val().trim();
+                if (!name) {
+                    showToast('과목명을 입력해주세요.', 'danger');
+                    return;
+                }
+
+                const sectionItems = $('.section-input-item');
+                if (sectionItems.length === 0) {
+                    showToast('최소 하나의 분반을 등록해야 합니다.', 'danger');
+                    return;
+                }
+
+                const sections = [];
+                let validationError = false;
+
+                sectionItems.each(function(i, secEl) {
+                    const timeRows = $(secEl).find('.time-row');
+                    const timeSlots = [];
+
+                    timeRows.each(function(j, rowEl) {
+                        const day = $(rowEl).find('.day-select').val();
+                        const startPeriod = parseInt($(rowEl).find('.start-period').val(), 10);
+                        const endPeriod = parseInt($(rowEl).find('.end-period').val(), 10);
+
+                        if (startPeriod > endPeriod) {
+                            showToast(`분반 #${i+1}의 시작교시가 종료교시보다 클 수 없습니다.`, 'danger');
+                            validationError = true;
+                            return false; // break inner loop
+                        }
+
+                        const startHour = startPeriod + START_HOUR_OFFSET;
+                        const endHour = endPeriod + START_HOUR_OFFSET + 1;
+
+                        timeSlots.push({
+                            day: day,
+                            start: startHour,
+                            end: endHour,
+                            periodText: `${startPeriod}~${endPeriod}교시`
+                        });
+                    });
+
+                    if (validationError) return false; // break outer loop
+
+                    sections.push({
+                        id: Date.now() + i, // 고유 임시 ID
+                        index: i + 1,
+                        times: timeSlots
+                    });
+                });
+
+                if (validationError) return;
+
+                // 첫 번째 분반 시간 기준 학점 계산
+                const firstSectionTimes = sections[0].times;
+                let calculatedCredit = 0;
+                firstSectionTimes.forEach(t => {
+                    calculatedCredit += (t.end - t.start);
+                });
+
+                // 학점(시간) 제한: 1학점 ~ 3학점
+                if (calculatedCredit < 1 || calculatedCredit > 3) {
+                    showToast(`수업 시간은 총 1시간(1학점) 이상, 3시간(3학점) 이하여야 합니다. (현재: ${calculatedCredit}시간)`, 'danger');
+                    return;
+                }
+
+                // colorIndex 랜덤 할당
+                const colorIndex = Math.floor(Math.random() * 10);
+
+                // JSON 객체 완성
+                const payload = {
+                    credit: calculatedCredit,
+                    colorIndex: colorIndex,
+                    sections: sections
+                };
+
+                // hidden input에 데이터 주입
+                $('#serializedContent').val(JSON.stringify(payload));
+
+                // 폼 실제 서브밋
+                this.submit();
+            });
+        });
+
+        function generatePeriodOptions() {
+            let options = '';
+            for (let p = 1; p <= MAX_PERIOD; p++) {
+                options += `<option value="${p}">${p}교시</option>`;
+            }
+            return options;
+        }
+
+        function addSection() {
+            const container = $('#sectionsContainer');
+            if (container.find('.section-input-item').length >= 3) {
+                showToast('분반은 최대 3개까지만 추가할 수 있습니다.', 'danger');
+                return;
+            }
+
+            const templateHtml = $('#sectionTemplate').html();
+            const $clone = $(templateHtml);
+
+            const timesContainer = $clone.find('.section-times');
+            addTimeRow(timesContainer);
+
+            container.append($clone);
+            updateSectionIndices();
+        }
+
+        function addTimeRow(container) {
+            const templateHtml = $('#timeRowTemplate').html();
+            const $clone = $(templateHtml);
+
+            const startSelect = $clone.find('.start-period');
+            const endSelect = $clone.find('.end-period');
+
+            const options = generatePeriodOptions();
+            startSelect.html(options);
+            endSelect.html(options);
+
+            startSelect.val("1");
+            endSelect.val("1");
+
+            container.append($clone);
+        }
+
+        function updateSectionIndices() {
+            $('.section-input-item').each(function(idx, el) {
+                $(el).find('.section-index').text(idx + 1);
+            });
+        }
+
+        function showToast(message, type = 'info') {
+            const container = $('#toastContainer');
+            const $toast = $(`<div class="toast-msg text-white bg-${type}">${message}</div>`);
+            
+            container.append($toast);
+            setTimeout(() => $toast.addClass('show'), 10);
+
+            setTimeout(() => {
+                $toast.removeClass('show');
+                setTimeout(() => $toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

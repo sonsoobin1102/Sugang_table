@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>시간표 & 목록 - 시간표 조합생성기</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* 기본 라이트 테마 (Blue - Pastel) */
+        :root {
+            --primary-color: #4a90e2;
+            --primary-dark: #357abd;
+            --secondary-color: #f8fafc;
+            --text-color: #1e293b;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --border-color: #cbd5e1;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --card-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            --grid-line: #e2e8f0;
+
+            /* Subject Colors (Pastel) */
+            --subj-0: #fca5a5; --subj-1: #fbcfe8; --subj-2: #f5d0fe; 
+            --subj-3: #ddd6fe; --subj-4: #c7d2fe; --subj-5: #bae6fd; 
+            --subj-6: #a5f3fc; --subj-7: #99f6e4; --subj-8: #a7f3d0; --subj-9: #bef264;
+        }
+
+        /* Modern Theme (Dark/Teal) */
+        [data-theme="modern"] {
+            --primary-color: #06b6d4;
+            --primary-dark: #0891b2;
+            --secondary-color: #1e293b;
+            --text-color: #f8fafc;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            --grid-line: #334155;
+
+            /* Subject Colors (Deep/Rich) */
+            --subj-0: #f43f5e; --subj-1: #ec4899; --subj-2: #d946ef; 
+            --subj-3: #8b5cf6; --subj-4: #6366f1; --subj-5: #3b82f6; 
+            --subj-6: #0ea5e9; --subj-7: #06b6d4; --subj-8: #14b8a6; --subj-9: #10b981;
+        }
+
+        /* Beige Theme (Warm - Earthy) */
+        [data-theme="beige"] {
+            --primary-color: #a1887f;
+            --primary-dark: #8d6e63;
+            --secondary-color: #efebe9;
+            --text-color: #4e342e;
+            --bg-color: #faf8f5;
+            --card-bg: #fffbf7;
+            --border-color: #d7ccc8;
+            --success-color: #81c784;
+            --danger-color: #e57373;
+            --card-shadow: 0 10px 15px -3px rgba(141, 110, 99, 0.1);
+            --grid-line: #e8e0d8;
+
+            /* Subject Colors (Warm Earthy) */
+            --subj-0: #bcaaa4; --subj-1: #d7ccc8; --subj-2: #ffccbc; 
+            --subj-3: #ffe0b2; --subj-4: #ffecb3; --subj-5: #dce775; 
+            --subj-6: #a5d6a7; --subj-7: #80cbc4; --subj-8: #bcaaa4; --subj-9: #e6ee9c;
+        }
+
+        /* Cyberpunk Theme (Neon) */
+        [data-theme="cyberpunk"] {
+            --primary-color: #ff00ff;
+            --primary-dark: #d600d6;
+            --secondary-color: #0a0033;
+            --text-color: #00fff9;
+            --bg-color: #000000;
+            --card-bg: #05001a;
+            --border-color: #ff00ff;
+            --success-color: #00ff00;
+            --danger-color: #ff3131;
+            --card-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
+            --grid-line: #220066;
+
+            /* Subject Colors (Neon glow) */
+            --subj-0: #ff0055; --subj-1: #ff00ff; --subj-2: #9d00ff; 
+            --subj-3: #0011ff; --subj-4: #00eaff; --subj-5: #00ff9d; 
+            --subj-6: #aaff00; --subj-7: #ffff00; --subj-8: #ffaa00; --subj-9: #ff0055;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .navbar {
+            background-color: var(--card-bg) !important;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .navbar-brand, .nav-link {
+            color: var(--text-color) !important;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            color: var(--text-color);
+        }
+
+        .card h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .table {
+            color: var(--text-color) !important;
+        }
+
+        .table th {
+            border-color: var(--border-color) !important;
+        }
+
+        .table td {
+            border-color: var(--border-color) !important;
+            vertical-align: middle;
+        }
+
+        /* Timetable Grid */
+        .timetable-grid {
+            display: grid;
+            grid-template-columns: 60px repeat(5, 1fr);
+            grid-template-rows: 40px repeat(12, 55px);
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .grid-header {
+            background-color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--grid-line);
+        }
+
+        .grid-cell {
+            border-bottom: 1px solid var(--grid-line);
+            border-right: 1px solid var(--grid-line);
+            position: relative;
+        }
+
+        .time-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-color);
+            opacity: 0.7;
+            background-color: var(--secondary-color);
+        }
+
+        /* Class Block on Grid */
+        .class-block {
+            position: relative;
+            width: 95%;
+            margin: 0 auto;
+            padding: 4px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            line-height: 1.2;
+            z-index: 10;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        /* Control Bar */
+        .control-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .result-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: var(--secondary-color);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        .pagination button {
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            padding: 5px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Toast Container */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1055;
+        }
+
+        .toast-msg {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin-top: 10px;
+            color: var(--text-color);
+            min-width: 250px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">📅 시간표 생성기</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/enter">과목 등록</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/list">시간표 & 목록</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-5 py-4">
+        <div class="row g-4">
+            <!-- Left Panel: 등록 과목 리스트 -->
+            <div class="col-lg-5 col-md-12">
+                <div class="card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="m-0 border-0 pb-0">등록된 과목 리스트</h2>
+                        <span class="badge bg-primary" id="totalCreditsDisplay" style="font-size: 0.95rem;">0학점</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover text-center align-middle">
+                            <thead>
+                                <tr>
+                                    <th>과목명</th>
+                                    <th>학점</th>
+                                    <th>분반 및 시간 정보</th>
+                                    <th>삭제</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (data.length === 0) { %>
+                                    <tr>
+                                        <td colspan="4" class="py-4 text-muted">등록된 과목이 없습니다. 과목 등록에서 추가해주세요.</td>
+                                    </tr>
+                                <% } else { %>
+                                    <% for(let i=0; i < data.length; i++){ %>
+                                        <% 
+                                            let parsed = { credit: 0, colorIndex: 0, sections: [] };
+                                            try {
+                                                parsed = JSON.parse(data[i].content);
+                                            } catch(e) {
+                                                console.error("JSON 파싱 에러:", e);
+                                            }
+                                            
+                                            let sectionsText = parsed.sections.map(sec => {
+                                                let timesText = sec.times.map(t => `${t.day} ${t.periodText || (t.start + '시-' + t.end + '시')}`).join(', ');
+                                                return `분반 ${sec.index}: ${timesText}`;
+                                            }).join('<br>');
+                                        %>
+                                        <tr>
+                                            <td class="fw-bold"><%= data[i].title %></td>
+                                            <td><span class="badge bg-secondary"><%= parsed.credit %>학점</span></td>
+                                            <td class="text-start" style="font-size: 0.85rem;"><%- sectionsText %></td>
+                                            <td>
+                                                <button class="delete btn btn-sm btn-outline-danger" data-id="<%= data[i].id %>">삭제</button>
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: 시간표 그리드 및 조합기 -->
+            <div class="col-lg-7 col-md-12">
+                <div class="card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="m-0 border-0 pb-0">📅 시간표 조합 시각화</h2>
+                        
+                        <div class="d-flex align-items-center gap-3">
+                            <!-- 테마 셀렉터 -->
+                            <div class="d-flex align-items-center gap-2">
+                                <label for="themeSelect" class="form-label m-0 fw-bold" style="white-space: nowrap;">🎨 테마:</label>
+                                <select id="themeSelect" class="form-select form-select-sm" style="width: 130px; background-color: var(--secondary-color); color: var(--text-color); border-color: var(--border-color);">
+                                    <option value="default">기본 (Blue)</option>
+                                    <option value="modern">모던 (Dark)</option>
+                                    <option value="beige">베이지 (Warm)</option>
+                                    <option value="cyberpunk">사이버펑크 (Neon)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 설정 컨트롤 -->
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                        <div class="form-check m-0">
+                            <input class="form-check-input" type="checkbox" id="lunchCheck">
+                            <label class="form-check-label fw-bold" for="lunchCheck" style="cursor: pointer;">
+                                🍱 점심 시간 확보 (11시~14시 사이 최소 1시간 비움)
+                            </label>
+                        </div>
+                        <button id="generateBtn" class="btn btn-primary fw-bold">✨ 가능한 모든 조합 찾기</button>
+                    </div>
+
+                    <!-- 결과 요약 -->
+                    <div id="resultSummary" class="result-summary hidden">
+                        <div class="d-flex justify-content-between align-items-center w-100">
+                            <h4 class="m-0 fw-bold">총 <span id="combinationCount" class="text-primary">0</span>개의 가능한 조합 발견</h4>
+                            <button id="downloadBtn" class="btn btn-sm btn-outline-success">📷 이미지 저장</button>
+                        </div>
+                        <div class="pagination d-flex justify-content-center align-items-center gap-3 mt-2">
+                            <button id="prevBtn" disabled>&lt; 이전</button>
+                            <span id="pageIndicator" class="fw-bold">0 / 0</span>
+                            <button id="nextBtn" disabled>다음 &gt;</button>
+                        </div>
+                    </div>
+
+                    <!-- 시간표 그리드 -->
+                    <div id="timetableGrid" class="timetable-grid">
+                        <!-- JS가 채워넣음 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 토스트 컨테이너 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // --- 데이터 모델 및 전역 변수 ---
+        // 서버로부터 EJS가 넣어준 데이터 파싱
+        const rawData = <%- JSON.stringify(data) %>;
+        const subjects = rawData.map(item => {
+            let parsed = { credit: 0, colorIndex: 0, sections: [] };
+            try {
+                parsed = JSON.parse(item.content);
+            } catch(e) {
+                console.error(e);
+            }
+            return {
+                id: item.id,
+                name: item.title,
+                credit: parsed.credit,
+                colorIndex: parsed.colorIndex,
+                sections: parsed.sections
+            };
+        });
+
+        let generatedCombinations = [];
+        let currentCombinationIndex = 0;
+
+        const MAX_PERIOD = 12; 
+        const START_HOUR_OFFSET = 8; // 1교시 = 9시
+        const START_HOUR = 9;
+        const END_HOUR = 20; // 12교시 20~21시
+
+        $(document).ready(function() {
+            // 학점 표시 업데이트
+            const totalCredits = subjects.reduce((sum, s) => sum + s.credit, 0);
+            $('#totalCreditsDisplay').text(`${totalCredits}학점`);
+            if (totalCredits > 24) {
+                $('#totalCreditsDisplay').removeClass('bg-primary').addClass('bg-danger');
+            }
+
+            // 그리드 그리기
+            renderTimetableGrid();
+
+            // 테마 변경 이벤트
+            $('#themeSelect').change(function() {
+                const theme = $(this).val();
+                if (theme === 'default') {
+                    $('body').removeAttr('data-theme');
+                } else {
+                    $('body').attr('data-theme', theme);
+                }
+            });
+
+            // AJAX 삭제 바인딩
+            $('.delete').click(function (e) {
+                if (!confirm('정말 삭제하시겠습니까?')) return;
+                let sid = $(this).attr('data-id');
+                let item = $(this);
+                $.ajax({
+                    type: 'post',
+                    url: '/delete',
+                    data: { _id: sid }
+                }).done(function (result) {
+                    showToast('과목이 삭제되었습니다.', 'success');
+                    item.closest('tr').remove();
+                    // 페이지 리로드해서 총 학점 및 상태 다시 로드
+                    setTimeout(() => window.location.reload(), 800);
+                }).fail(function (xhr, textStatus, errorThrown) {
+                    showToast('과목 삭제 실패', 'danger');
+                });
+            });
+
+            // 조합 계산 바인딩
+            $('#generateBtn').click(generateTimetable);
+            $('#prevBtn').click(() => showCombination(currentCombinationIndex - 1));
+            $('#nextBtn').click(() => showCombination(currentCombinationIndex + 1));
+            $('#downloadBtn').click(downloadTimetable);
+        });
+
+        // --- 알고리즘 (백트래킹) ---
+        function generateTimetable() {
+            renderTimetableGrid(); // 리셋
+
+            if (subjects.length === 0) {
+                showToast('등록된 과목이 없습니다. 과목을 먼저 등록해주세요.', 'info');
+                return;
+            }
+
+            generatedCombinations = [];
+            findCombinations(0, []);
+            
+            $('#resultSummary').removeClass('hidden');
+            $('#combinationCount').text(generatedCombinations.length);
+            
+            if (generatedCombinations.length > 0) {
+                currentCombinationIndex = 0;
+                showCombination(0);
+                showToast(`총 ${generatedCombinations.length}개의 조합을 찾았습니다!`, 'success');
+            } else {
+                showToast('가능한 시간표 조합이 없습니다. 원인을 분석합니다.', 'danger');
+                analyzeConflicts();
+            }
+        }
+
+        function findCombinations(subjectIdx, currentSchedule) {
+            if (subjectIdx === subjects.length) {
+                if ($('#lunchCheck').is(':checked')) {
+                    if (!checkLunchBreak(currentSchedule)) return; 
+                }
+                generatedCombinations.push([...currentSchedule]);
+                return;
+            }
+
+            const currentSubject = subjects[subjectIdx];
+            for (const section of currentSubject.sections) {
+                if (!isConflict(section, currentSchedule)) {
+                    currentSchedule.push({
+                        subjectName: currentSubject.name,
+                        colorIndex: currentSubject.colorIndex,
+                        ...section
+                    });
+                    
+                    findCombinations(subjectIdx + 1, currentSchedule);
+                    currentSchedule.pop(); // backtracking
+                }
+            }
+        }
+
+        function isConflict(newSection, currentSchedule) {
+            for (const existingItem of currentSchedule) {
+                for (const existingTime of existingItem.times) {
+                    for (const newTime of newSection.times) {
+                        if (existingTime.day === newTime.day) {
+                            if (existingTime.start < newTime.end && newTime.start < existingTime.end) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        function checkLunchBreak(schedule) {
+            const dayMap = { '월': [], '화': [], '수': [], '목': [], '금': [] };
+            for (const item of schedule) {
+                for (const t of item.times) {
+                    if (t.start < 14 && t.end > 11) {
+                        const overlapStart = Math.max(t.start, 11);
+                        const overlapEnd = Math.min(t.end, 14);
+                        dayMap[t.day].push({ start: overlapStart, end: overlapEnd });
+                    }
+                }
+            }
+            
+            const days = ['월', '화', '수', '목', '금'];
+            for (const day of days) {
+                const intervals = dayMap[day];
+                if (intervals.length === 0) continue;
+                
+                intervals.sort((a, b) => a.start - b.start);
+                if (intervals[0].start - 11 >= 1) continue;
+                
+                let foundGap = false;
+                for (let i = 0; i < intervals.length - 1; i++) {
+                    if (intervals[i+1].start - intervals[i].end >= 1) {
+                        foundGap = true;
+                        break;
+                    }
+                }
+                if (foundGap) continue;
+                if (14 - intervals[intervals.length - 1].end >= 1) continue;
+                
+                return false; // 점심시간(1시간)이 없음
+            }
+            return true;
+        }
+
+        function analyzeConflicts() {
+            const reasons = [];
+            const isLunchGuaranteed = $('#lunchCheck').is(':checked');
+
+            if (isLunchGuaranteed) {
+                subjects.forEach(subj => {
+                    const allSectionsFail = subj.sections.every(sec => {
+                        return !checkLunchBreak([{ times: sec.times }]);
+                    });
+                    if (allSectionsFail) {
+                        reasons.push(`🍱 <strong>[${subj.name}]</strong>의 모든 분반이 점심시간(11~14시)을 가로막습니다.`);
+                    }
+                });
+            }
+
+            for (let i = 0; i < subjects.length; i++) {
+                for (let j = i + 1; j < subjects.length; j++) {
+                    const subjA = subjects[i];
+                    const subjB = subjects[j];
+                    
+                    let hasCompatiblePair = false;
+                    for (const secA of subjA.sections) {
+                        for (const secB of subjB.sections) {
+                            if (!isSectionConflict(secA, secB)) {
+                                hasCompatiblePair = true;
+                                break;
+                            }
+                        }
+                        if (hasCompatiblePair) break;
+                    }
+
+                    if (!hasCompatiblePair) {
+                        reasons.push(`<strong>[${subjA.name}]</strong>와(과) <strong>[${subjB.name}]</strong>의 수업 시간이 충돌합니다.`);
+                    }
+                }
+            }
+
+            const grid = document.getElementById('timetableGrid');
+            grid.innerHTML = ''; 
+            
+            const reportBox = document.createElement('div');
+            reportBox.style.gridColumn = "1 / -1";
+            reportBox.style.gridRow = "1 / -1";
+            reportBox.style.padding = "20px";
+            reportBox.style.display = "flex";
+            reportBox.style.flexDirection = "column";
+            reportBox.style.justifyContent = "center";
+            reportBox.style.alignItems = "center";
+            reportBox.style.backgroundColor = "rgba(239, 68, 68, 0.1)";
+            reportBox.style.zIndex = "10";
+            reportBox.style.borderRadius = "12px";
+
+            let html = '<h4 class="text-danger fw-bold mb-3">❌ 시간표를 조합할 수 없습니다</h4>';
+            if (reasons.length > 0) {
+                html += '<ul class="text-start" style="font-size:0.9rem; line-height:1.7;">';
+                const uniqueReasons = [...new Set(reasons)];
+                uniqueReasons.forEach(r => html += `<li>${r}</li>`);
+                html += '</ul>';
+            } else {
+                html += '<p style="font-size:0.9rem;">시간표를 조합할 수 있는 조건이 갖춰지지 않았습니다. 과목 시간대를 조율해주세요.</p>';
+            }
+            
+            reportBox.innerHTML = html;
+            grid.appendChild(reportBox);
+        }
+
+        function isSectionConflict(secA, secB) {
+            for (const timeA of secA.times) {
+                for (const timeB of secB.times) {
+                    if (timeA.day === timeB.day) {
+                        if (timeA.start < timeB.end && timeB.start < timeA.end) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        // --- 시각화 ---
+        function renderTimetableGrid() {
+            const grid = document.getElementById('timetableGrid');
+            grid.innerHTML = ''; 
+
+            const days = ['', '월', '화', '수', '목', '금'];
+            days.forEach(day => {
+                const div = document.createElement('div');
+                div.className = 'grid-header';
+                div.textContent = day;
+                grid.appendChild(div);
+            });
+
+            let rowIndex = 2;
+            for (let h = START_HOUR; h <= END_HOUR; h++) {
+                const timeLabel = document.createElement('div');
+                timeLabel.className = 'grid-cell time-label';
+                timeLabel.textContent = `${h < 10 ? '0'+h : h}:00`;
+                timeLabel.style.gridColumn = "1";
+                timeLabel.style.gridRow = String(rowIndex);
+                grid.appendChild(timeLabel);
+
+                for (let d = 0; d < 5; d++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+                    cell.style.gridColumn = String(d + 2);
+                    cell.style.gridRow = String(rowIndex);
+                    grid.appendChild(cell);
+                }
+                rowIndex++;
+            }
+        }
+
+        function showCombination(index) {
+            if (index < 0 || index >= generatedCombinations.length) return;
+            
+            currentCombinationIndex = index;
+            
+            $('#prevBtn').prop('disabled', index === 0);
+            $('#nextBtn').prop('disabled', index === generatedCombinations.length - 1);
+            $('#pageIndicator').text(`${index + 1} / ${generatedCombinations.length}`);
+
+            $('.class-block').remove();
+
+            const combination = generatedCombinations[index];
+            const dayMap = { '월': 0, '화': 1, '수': 2, '목': 3, '금': 4 };
+
+            combination.forEach(item => {
+                item.times.forEach(t => {
+                    const dayIdx = dayMap[t.day];
+                    if (dayIdx === undefined) return;
+
+                    const duration = t.end - t.start; 
+                    const startH = t.start;
+                    
+                    const block = document.createElement('div');
+                    block.className = 'class-block';
+                    block.style.backgroundColor = `var(--subj-${item.colorIndex})`;
+                    block.innerHTML = `<span style="font-size:0.85rem; display:block;">${item.subjectName}</span><span style="font-size:0.75rem; opacity:0.85;">분반 ${item.index}</span>`;
+                    
+                    block.style.gridColumn = dayIdx + 2; 
+                    const rowStart = startH - START_HOUR + 2;
+                    const rowEnd = rowStart + duration;
+                    block.style.gridRow = `${rowStart} / ${rowEnd}`;
+                    
+                    document.getElementById('timetableGrid').appendChild(block);
+                });
+            });
+        }
+
+        function downloadTimetable() {
+            const grid = document.getElementById('timetableGrid');
+            html2canvas(grid, { scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `timetable_combination_${currentCombinationIndex + 1}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+                showToast('시간표 이미지가 저장되었습니다! 📸', 'success');
+            });
+        }
+
+        function showToast(message, type = 'info') {
+            const container = $('#toastContainer');
+            const $toast = $(`<div class="toast-msg text-white bg-${type}">${message}</div>`);
+            
+            container.append($toast);
+            setTimeout(() => $toast.addClass('show'), 10);
+
+            setTimeout(() => {
+                $toast.removeClass('show');
+                setTimeout(() => $toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
