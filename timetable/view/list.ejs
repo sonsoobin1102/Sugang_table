@@ -332,10 +332,16 @@
                                                 console.error("JSON 파싱 에러:", e);
                                             }
                                             
-                                            let sectionsText = parsed.sections.map(sec => {
-                                                let timesText = sec.times.map(t => `${t.day} ${t.periodText || (t.start + '시-' + t.end + '시')}`).join(', ');
-                                                return `분반 ${sec.index}: ${timesText}`;
-                                            }).join('<br>');
+                                            let sectionsText = "";
+                                            if (parsed && Array.isArray(parsed.sections)) {
+                                                sectionsText = parsed.sections.map(sec => {
+                                                    let timesText = "";
+                                                    if (sec.times && Array.isArray(sec.times)) {
+                                                        timesText = sec.times.map(t => `${t.day} ${t.periodText || (t.start + '시-' + t.end + '시')}`).join(', ');
+                                                    }
+                                                    return `분반 ${sec.index}: ${timesText}`;
+                                                }).join('<br>');
+                                            }
                                         %>
                                         <tr>
                                             <td class="fw-bold"><%= data[i].title %></td>
@@ -426,9 +432,9 @@
             return {
                 id: item.id,
                 name: item.title,
-                credit: parsed.credit,
-                colorIndex: parsed.colorIndex,
-                sections: parsed.sections
+                credit: parsed.credit || 0,
+                colorIndex: parsed.colorIndex || 0,
+                sections: parsed.sections || []
             };
         });
 
