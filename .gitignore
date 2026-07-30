@@ -1,3 +1,9 @@
+<<<<<<< HEAD
 node_modules/
 .DS_Store
 *.log
+=======
+/.GEMINI
+timetable/node_modules
+timetable/.agent
+>>>>>>> 5df9df29bc00c054093d14b0a0972b12e3457a99
