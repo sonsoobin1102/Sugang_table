@@ -1,0 +1,17 @@
+{
+  "name": "timetable",
+  "version": "1.0.0",
+  "description": "University sugang timetable generator",
+  "license": "ISC",
+  "author": "antigravity",
+  "type": "commonjs",
+  "main": "Server.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "ejs": "^3.1.9",
+    "express": "^4.19.2"
+  }
+}
