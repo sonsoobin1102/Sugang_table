@@ -163,15 +163,15 @@
         </div>
     </nav>
 
-    <div class="container mt-5" style="max-width: 650px;">
-        <div class="card p-4">
+    <div class="container mt-5 mb-5" style="max-width: 650px;">
+        <div class="card p-4 mb-4">
             <h2 class="mb-4 text-center fw-bold">✨ 과목 등록하기</h2>
             
             <form id="subjectForm">
                 <!-- 과목명 -->
                 <div class="form-group mb-3">
                     <label class="form-label fw-bold">과목명</label>
-                    <input type="text" id="subjectName" name="title" class="form-control" placeholder="예: 자료구조" required>
+                    <input type="text" id="subjectName" name="title" class="form-control" placeholder="예: 자료구조" required autofocus>
                 </div>
                 
                 <!-- 분반 컨테이너 -->
@@ -186,9 +186,20 @@
                 </div>
 
                 <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary btn-lg fw-bold">저장하기</button>
+                    <button type="submit" class="btn btn-primary btn-lg fw-bold">과목 저장하기</button>
                 </div>
             </form>
+        </div>
+
+        <!-- 실시간 등록 완료 과목 요약 카드 -->
+        <div class="card p-4" id="registeredCard">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="m-0 fw-bold">📋 현재 등록된 과목 목록 (<span id="regCount">0</span>개)</h5>
+                <a href="list.html" class="btn btn-sm btn-outline-success">시간표 조합 생성하기 &rarr;</a>
+            </div>
+            <div id="registeredList" class="d-flex flex-wrap gap-2">
+                <!-- 실시간 등록 과목들이 표시됨 -->
+            </div>
         </div>
     </div>
 
@@ -238,14 +249,31 @@
         const MAX_PERIOD = 12;
         const START_HOUR_OFFSET = 8; 
 
-        $(document).ready(function() {
-            // 초기 분반 추가
-            addSection();
+        function renderRegisteredList() {
+            const list = window.SubjectRepository ? window.SubjectRepository.getAll() : [];
+            $('#regCount').text(list.length);
+            const container = $('#registeredList');
+            container.empty();
+            if (list.length === 0) {
+                container.html('<span class="text-muted" style="font-size:0.88rem;">아직 등록된 과목이 없습니다. 위에서 과목을 입력해 등록해보세요!</span>');
+                return;
+            }
+            list.forEach(item => {
+                let creditText = '';
+                try {
+                    const parsed = typeof item.content === 'string' ? JSON.parse(item.content) : item.content;
+                    if (parsed.credit) creditText = ` (${parsed.credit}학점)`;
+                } catch(e){}
+                container.append(`<span class="badge bg-secondary p-2" style="font-size:0.88rem;">✅ ${item.title}${creditText}</span>`);
+            });
+        }
 
-            // 이벤트 바인딩
+        $(document).ready(function() {
+            addSection();
+            renderRegisteredList();
+
             $('#addSectionBtn').click(addSection);
 
-            // 이벤트 위임
             $('#sectionsContainer').on('click', '.remove-section', function() {
                 $(this).closest('.section-input-item').remove();
                 updateSectionIndices();
@@ -265,7 +293,6 @@
                 $(this).closest('.time-row').remove();
             });
 
-            // 폼 서브밋 시 직렬화
             $('#subjectForm').submit(function(e) {
                 e.preventDefault();
 
@@ -342,12 +369,14 @@
 
                 if (window.SubjectRepository) {
                     window.SubjectRepository.save(name, payload);
-                    showToast('과목이 성공적으로 저장되었습니다! 다음 과목을 계속 등록할 수 있습니다.', 'success');
+                    showToast(`✅ [${name}] 과목이 성공적으로 등록되었습니다! 다음 과목을 계속 입력하세요.`, 'success');
                     
-                    // 폼 초기화하여 연속 등록 가능하도록 함
+                    // 폼 초기화 및 과목명 입력란으로 포커스 이동
                     $('#subjectName').val('');
                     $('#sectionsContainer').empty();
                     addSection();
+                    renderRegisteredList();
+                    $('#subjectName').focus();
                 } else {
                     showToast('저장소 모듈 오류', 'danger');
                 }

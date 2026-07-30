@@ -246,6 +246,18 @@
         &copy; 2026 Timetable Generator. Advanced Web Programming Midterm Project.
     </footer>
 
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.nav-link, .navbar-brand').click(function(e) {
+                const href = $(this).attr('href');
+                if (href === 'index.html' || href === './' || href === '/') {
+                    e.preventDefault();
+                    window.location.reload();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
