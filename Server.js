@@ -8,6 +8,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // Static asset middleware
+app.use(express.static(__dirname));
 app.use('/js', express.static(path.join(__dirname, 'js')));
 
 // View engine setup
@@ -20,13 +21,13 @@ app.get('/', function (req, res) {
 });
 
 // Subject entry page
-app.get('/enter', function (req, res) {
-    res.render('enter.ejs');
+app.get(['/enter', '/enter.html'], function (req, res) {
+    res.sendFile(path.join(__dirname, 'enter.html'));
 });
 
 // Timetable and subject list page
-app.get('/list', function (req, res) {
-    res.render('list.ejs', { data: [] });
+app.get(['/list', '/list.html'], function (req, res) {
+    res.sendFile(path.join(__dirname, 'list.html'));
 });
 
 // Start server
