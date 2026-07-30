@@ -78,6 +78,9 @@
         }
 
         .table {
+            --bs-table-color: var(--text-color);
+            --bs-table-hover-color: #ffffff;
+            --bs-table-hover-bg: #334155;
             color: var(--text-color) !important;
         }
 
@@ -88,7 +91,17 @@
 
         .table td {
             border-color: var(--border-color) !important;
+            color: var(--text-color) !important;
             vertical-align: middle;
+        }
+
+        .table-hover tbody tr:hover {
+            color: #ffffff !important;
+            background-color: #334155 !important;
+        }
+
+        .table-hover tbody tr:hover td {
+            color: #ffffff !important;
         }
 
         .timetable-grid {
