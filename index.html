@@ -42,6 +42,21 @@
             color: var(--primary-color) !important;
         }
 
+        .nav-link.active {
+            color: var(--primary-color) !important;
+            font-weight: 700;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        @keyframes cardFadeIn {
+            0% { opacity: 0.3; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .home-card-animate {
+            animation: cardFadeIn 0.35s ease-out;
+        }
+
         .main-container {
             flex: 1;
             display: flex;
@@ -182,7 +197,7 @@
     </nav>
 
     <div class="main-container">
-        <div class="home-card">
+        <div class="home-card home-card-animate">
             <h1 class="hero-title">📅 대학 시간표 조합생성기</h1>
             <p class="hero-subtitle">수강하고 싶은 과목과 분반을 입력하고, 백트래킹 알고리즘을 사용하여<br>서로 겹치지 않는 가능한 모든 시간표 조합을 실시간으로 확인해보세요!</p>
 

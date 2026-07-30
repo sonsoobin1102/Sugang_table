@@ -9,27 +9,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        /* 기본 라이트 테마 (Blue - Pastel) */
         :root {
-            --primary-color: #4a90e2;
-            --primary-dark: #357abd;
-            --secondary-color: #f8fafc;
-            --text-color: #1e293b;
-            --bg-color: #f1f5f9;
-            --card-bg: #ffffff;
-            --border-color: #cbd5e1;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary-color: #10b981;
             --success-color: #10b981;
             --danger-color: #ef4444;
-            --card-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
-            --grid-line: #e2e8f0;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            --grid-line: #334155;
 
-            /* Subject Colors (Pastel) */
             --subj-0: #fca5a5; --subj-1: #fbcfe8; --subj-2: #f5d0fe; 
             --subj-3: #ddd6fe; --subj-4: #c7d2fe; --subj-5: #bae6fd; 
             --subj-6: #a5f3fc; --subj-7: #99f6e4; --subj-8: #a7f3d0; --subj-9: #bef264;
         }
-
-
 
         * {
             box-sizing: border-box;
@@ -58,6 +55,12 @@
             color: var(--primary-color) !important;
         }
 
+        .nav-link.active {
+            color: var(--primary-color) !important;
+            font-weight: 700;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
         .card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -80,6 +83,7 @@
 
         .table th {
             border-color: var(--border-color) !important;
+            color: var(--text-muted);
         }
 
         .table td {
@@ -87,92 +91,90 @@
             vertical-align: middle;
         }
 
-        /* Timetable Grid */
         .timetable-grid {
             display: grid;
             grid-template-columns: 60px repeat(5, 1fr);
             grid-template-rows: 40px repeat(12, 55px);
             border: 1px solid var(--border-color);
-            background-color: var(--card-bg);
+            background-color: #0f172a;
             border-radius: 12px;
             overflow: hidden;
             position: relative;
         }
 
         .grid-header {
-            background-color: var(--secondary-color);
+            background-color: #1e293b;
+            color: var(--text-color);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
+            font-size: 0.9rem;
             border-bottom: 1px solid var(--border-color);
-            border-right: 1px solid var(--grid-line);
+            border-right: 1px solid var(--border-color);
         }
 
         .grid-cell {
-            border-bottom: 1px solid var(--grid-line);
-            border-right: 1px solid var(--grid-line);
-            position: relative;
+            border-bottom: 1px dashed var(--grid-line);
+            border-right: 1px solid var(--border-color);
         }
 
         .time-label {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background-color: #0f172a;
             font-weight: 600;
-            color: var(--text-color);
-            opacity: 0.7;
-            background-color: var(--secondary-color);
         }
 
-        /* Class Block on Grid */
         .class-block {
-            position: relative;
-            width: 95%;
-            margin: 0 auto;
-            padding: 4px;
             border-radius: 8px;
-            font-size: 0.8rem;
-            color: #ffffff;
-            font-weight: 600;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 6px;
+            color: #0f172a;
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin: 2px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            line-height: 1.2;
-            z-index: 10;
-            border: 1px solid rgba(255,255,255,0.15);
-        }
-
-        /* Control Bar */
-        .control-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+            word-break: break-all;
+            overflow: hidden;
+            z-index: 5;
         }
 
         .result-summary {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            background-color: var(--secondary-color);
-            padding: 15px;
+            background-color: rgba(99, 102, 241, 0.15);
+            border: 1px solid var(--primary-color);
             border-radius: 12px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border-color);
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            color: #e0e7ff;
+        }
+
+        .hidden {
+            display: none !important;
         }
 
         .pagination button {
+            background-color: #0f172a;
             border: 1px solid var(--border-color);
-            background: var(--card-bg);
             color: var(--text-color);
-            padding: 5px 12px;
-            border-radius: 6px;
+            border-radius: 8px;
+            padding: 6px 16px;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background-color: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
         }
 
         .pagination button:disabled {
@@ -180,11 +182,15 @@
             cursor: not-allowed;
         }
 
-        .hidden {
-            display: none !important;
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
         }
 
-        /* Toast Container */
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
         .toast-container {
             position: fixed;
             bottom: 20px;
@@ -193,12 +199,12 @@
         }
 
         .toast-msg {
-            background-color: var(--card-bg);
+            background-color: #1e293b;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 12px 20px;
             margin-top: 10px;
-            color: var(--text-color);
+            color: #fff;
             min-width: 250px;
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
             display: flex;
@@ -219,20 +225,20 @@
 <body>
     <nav class="navbar navbar-expand-lg bg-dark">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="/">📅 시간표 생성기</a>
+            <a class="navbar-brand fw-bold" href="index.html">📅 시간표 생성기</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
+                        <a class="nav-link" href="index.html">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/enter">과목 등록</a>
+                        <a class="nav-link" href="enter.html">과목 등록</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="/list">시간표 & 목록</a>
+                        <a class="nav-link active" href="list.html">시간표 & 목록</a>
                     </li>
                 </ul>
             </div>
@@ -272,8 +278,6 @@
                 <div class="card p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2 class="m-0 border-0 pb-0">📅 시간표 조합 시각화</h2>
-                        
-
                     </div>
 
                     <!-- 설정 컨트롤 -->
@@ -314,18 +318,17 @@
 
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/storage.js"></script>
+    <script src="js/storage.js"></script>
     
     <script>
-        // --- 데이터 모델 및 전역 변수 ---
         let subjects = [];
         let generatedCombinations = [];
         let currentCombinationIndex = 0;
 
         const MAX_PERIOD = 12; 
-        const START_HOUR_OFFSET = 8; // 1교시 = 9시
+        const START_HOUR_OFFSET = 8;
         const START_HOUR = 9;
-        const END_HOUR = 20; // 12교시 20~21시
+        const END_HOUR = 20;
 
         function loadSubjectsFromStorage() {
             const rawData = window.SubjectRepository ? window.SubjectRepository.getAll() : [];
@@ -401,13 +404,9 @@
         }
 
         $(document).ready(function() {
-            // LocalStorage로부터 과목 목록 로드 및 테이블 렌더링
             loadSubjectsFromStorage();
-
-            // 그리드 그리기
             renderTimetableGrid();
 
-            // 삭제 바인딩 (동적 요소를 위한 이벤트 위임)
             $('#subjectTableBody').on('click', '.delete', function (e) {
                 if (!confirm('정말 삭제하시겠습니까?')) return;
                 let targetId = $(this).attr('data-id');
@@ -422,16 +421,14 @@
                 }
             });
 
-            // 조합 계산 바인딩
             $('#generateBtn').click(generateTimetable);
             $('#prevBtn').click(() => showCombination(currentCombinationIndex - 1));
             $('#nextBtn').click(() => showCombination(currentCombinationIndex + 1));
             $('#downloadBtn').click(downloadTimetable);
         });
 
-        // --- 알고리즘 (백트래킹) ---
         function generateTimetable() {
-            renderTimetableGrid(); // 리셋
+            renderTimetableGrid();
 
             if (subjects.length === 0) {
                 showToast('등록된 과목이 없습니다. 과목을 먼저 등록해주세요.', 'info');
@@ -473,7 +470,7 @@
                     });
                     
                     findCombinations(subjectIdx + 1, currentSchedule);
-                    currentSchedule.pop(); // backtracking
+                    currentSchedule.pop();
                 }
             }
         }
@@ -523,7 +520,7 @@
                 if (foundGap) continue;
                 if (14 - intervals[intervals.length - 1].end >= 1) continue;
                 
-                return false; // 점심시간(1시간)이 없음
+                return false;
             }
             return true;
         }
@@ -607,7 +604,6 @@
             return false;
         }
 
-        // --- 시각화 ---
         function renderTimetableGrid() {
             const grid = document.getElementById('timetableGrid');
             grid.innerHTML = ''; 
